@@ -2,10 +2,12 @@
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 #define LIGA 1
+#define LEDVE 8
 
 void setup() {
   lcd.begin(16, 2);
   pinMode(LIGA, INPUT);
+  pinMode(LEDVE, OUTPUT);
   // put your setup code here, to run once:
 }
 
@@ -15,6 +17,7 @@ void inputValveDisplay(){
   lcd.print("V.E.");
   lcd.setCursor(4,1);
   lcd.print("Acionada");
+  digitalWrite(LEDVE, HIGH);
   while (true)
   {
     delay(1000);
