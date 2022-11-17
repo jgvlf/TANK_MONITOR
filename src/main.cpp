@@ -16,6 +16,21 @@ void setup() {
   // put your setup code here, to run once:
 }
 
+void turnOnMotorDisplay(){
+  lcd.clear();
+  digitalWrite(MOTOR, HIGH);
+  for (int i = 5; i >= 0; i--)
+  {
+    lcd.setCursor(1,0);
+    lcd.print("Motor de Agito");
+    lcd.setCursor(0,1);
+    String timeStr = String(i);
+    lcd.print("LIGADO: "+timeStr);
+    delay(1000);
+  }
+  lcd.clear();
+  }
+
 void verifySNA(){
   if(digitalRead(SNA) == HIGH)
     {
