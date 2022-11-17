@@ -7,7 +7,10 @@
   #define MOTOR 10
   #define LEDVS 11
   #define SNB 12
+  #define CLEANLED 13
+  #define BUZZER 0
 
+int count = 0;
 
   void setup() {
     lcd.begin(16, 2);
@@ -17,6 +20,8 @@
     pinMode(MOTOR, OUTPUT);
     pinMode(SNB, INPUT);
     pinMode(LEDVS, OUTPUT);
+    pinMode(CLEANLED, OUTPUT);
+    pinMode(BUZZER, OUTPUT);
     // put your setup code here, to run once:
   }
 
@@ -42,6 +47,7 @@
       {
         digitalWrite(LEDVE, LOW);
         turnOnMotorDisplay();
+        count += 1;
       }
       else{
         lcd.clear();
@@ -110,9 +116,46 @@
     verifySNB();
   }
 
+  void cleanDisplay(){
+    lcd.clear();
+    for (int i = 3; i >= 0; i--)
+    {
+      lcd.setCursor(4,0);
+      lcd.print("Limpando");
+      lcd.setCursor(5,1);
+      String timeStr = String(i);
+      lcd.print(timeStr+" seg.");
+      delay(1000);
+    }
+    digitalWrite(BUZZER, HIGH);
+    delay(250);
+    digitalWrite(BUZZER, LOW);
+    delay(250);
+    digitalWrite(BUZZER, HIGH);
+    delay(250);
+    digitalWrite(BUZZER, LOW);
+    delay(250);
+    digitalWrite(BUZZER, HIGH);
+    delay(2000);
+    digitalWrite(BUZZER, LOW);
+    delay(2000);
+    lcd.clear();
+    count = 0;
+  }
+
+  void verifyClean(){
+    if(count % 3 == 0 && count != 0){
+      digitalWrite(CLEANLED, HIGH);
+      cleanDisplay();
+      digitalWrite(CLEANLED, LOW);
+    }
+  }
+
   void loop() {
+    digitalWrite(BUZZER, LOW);
     initialDisplay();
     buttonLigaIsPressed();
+    verifyClean();
     
     
   }
