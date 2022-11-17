@@ -16,17 +16,25 @@ void setup() {
   // put your setup code here, to run once:
 }
 
+void verifySNA(){
+  if(digitalRead(SNA) == HIGH)
+    {
+      digitalWrite(LEDVE, LOW);
+      turnOnMotorDisplay();
+    }
+}
+
 void inputValveDisplay(){
   lcd.clear();
+  while (digitalRead(SNA) == LOW)
+  {
   lcd.setCursor(6,0);
   lcd.print("V.E.");
   lcd.setCursor(4,1);
   lcd.print("Acionada");
   digitalWrite(LEDVE, HIGH);
-  while (true)
-  {
-    delay(1000);
   }
+  verifySNA();
 }
 
 void buttonLigaIsPressed(){
@@ -48,4 +56,5 @@ void initialDisplay(){ //The inital message of programm
 void loop() {
   initialDisplay();
   buttonLigaIsPressed();
+  
 }
