@@ -30,8 +30,9 @@ void inputValveDisplay(){
 }
 
 void buttonLigaIsPressed(){
-  if(digitalRead(LIGA) == HIGH)
+  if(digitalRead(LIGA) == HIGH && digitalRead(SNA) == LOW)
     {
+      
       inputValveDisplay();
     }
 }
