@@ -1,75 +1,118 @@
-#include <Arduino.h>
-#include <LiquidCrystal.h>
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
-#define LIGA 1
-#define LEDVE 8
-#define SNA 9
-#define MOTOR 10
+  #include <Arduino.h>
+  #include <LiquidCrystal.h>
+  LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+  #define LIGA 1
+  #define LEDVE 8
+  #define SNA 9
+  #define MOTOR 10
+  #define LEDVS 11
+  #define SNB 12
 
 
-void setup() {
-  lcd.begin(16, 2);
-  pinMode(LIGA, INPUT);
-  pinMode(LEDVE, OUTPUT);
-  pinMode(SNA, INPUT);
-  pinMode(MOTOR, OUTPUT);
-  // put your setup code here, to run once:
-}
-
-void turnOnMotorDisplay(){
-  lcd.clear();
-  digitalWrite(MOTOR, HIGH);
-  for (int i = 5; i >= 0; i--)
-  {
-    lcd.setCursor(1,0);
-    lcd.print("Motor de Agito");
-    lcd.setCursor(0,1);
-    String timeStr = String(i);
-    lcd.print("LIGADO: "+timeStr);
-    delay(1000);
-  }
-  lcd.clear();
+  void setup() {
+    lcd.begin(16, 2);
+    pinMode(LIGA, INPUT);
+    pinMode(LEDVE, OUTPUT);
+    pinMode(SNA, INPUT);
+    pinMode(MOTOR, OUTPUT);
+    pinMode(SNB, INPUT);
+    pinMode(LEDVS, OUTPUT);
+    // put your setup code here, to run once:
   }
 
-void verifySNA(){
-  if(digitalRead(SNA) == HIGH)
+  void turnOnMotorDisplay(){
+    lcd.clear();
+    digitalWrite(MOTOR, HIGH);
+    for (int i = 5; i >= 0; i--)
     {
-      digitalWrite(LEDVE, LOW);
-      turnOnMotorDisplay();
+      lcd.setCursor(4,0);
+      lcd.print("Agitando");
+      lcd.setCursor(5,1);
+      String timeStr = String(i);
+      lcd.print(timeStr+" seg.");
+      delay(1000);
     }
-}
+    lcd.clear();
+    digitalWrite(MOTOR, LOW);
+    outputValveDisplay();
+    }
 
-void inputValveDisplay(){
-  lcd.clear();
-  while (digitalRead(SNA) == LOW)
-  {
-  lcd.setCursor(6,0);
-  lcd.print("V.E.");
-  lcd.setCursor(4,1);
-  lcd.print("Acionada");
-  digitalWrite(LEDVE, HIGH);
+  void verifySNA(){
+    if(digitalRead(SNA) == HIGH && digitalRead(SNB) == HIGH || digitalRead(SNA) == LOW && digitalRead(SNB) == HIGH)
+      {
+        digitalWrite(LEDVE, LOW);
+        turnOnMotorDisplay();
+      }
+      else{
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("ERROR.");
+        delay(2000);
+        lcd.clear();
+        digitalWrite(LEDVE, LOW);
+      }
   }
-  verifySNA();
-}
 
-void buttonLigaIsPressed(){
-  if(digitalRead(LIGA) == HIGH && digitalRead(SNA) == LOW)
+  void verifySNB(){
+    if(digitalRead(SNB) == LOW && digitalRead(SNA) == LOW)
+        {
+          digitalWrite(LEDVS, LOW);
+          lcd.clear();
+        }
+        else{
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("ERROR.");
+          delay(2000);
+          lcd.clear();
+          digitalWrite(LEDVS, LOW);
+        }
+  }
+
+  void inputValveDisplay(){
+    lcd.clear();
+    while (digitalRead(SNA) == LOW)
     {
-      
-      inputValveDisplay();
+    lcd.setCursor(6,0);
+    lcd.print("V.E.");
+    lcd.setCursor(4,1);
+    lcd.print("Acionada");
+    digitalWrite(LEDVE, HIGH);
     }
-}
+    verifySNA();
+  }
+
+  void buttonLigaIsPressed(){
+    if(digitalRead(LIGA) == HIGH && ((digitalRead(SNA) == LOW && digitalRead(SNB) == LOW) || (digitalRead(SNA) == LOW && digitalRead(SNB) == HIGH)))
+      {
+        inputValveDisplay();
+      }
+  }
 
 
-void initialDisplay(){ //The inital message of programm
-  lcd.setCursor(3,0);
-  lcd.print("Pressione");
-  lcd.setCursor(6,1);
-  lcd.print("LIGA");
-}
+  void initialDisplay(){ //The inital message of programm
+    lcd.setCursor(3,0);
+    lcd.print("Pressione");
+    lcd.setCursor(6,1);
+    lcd.print("LIGA");
+  }
 
-void loop() {
-  initialDisplay();
-  buttonLigaIsPressed();
-  
-}
+  void outputValveDisplay(){
+    lcd.clear();
+    while (digitalRead(SNB) == HIGH)
+    {
+    lcd.setCursor(6,0);
+    lcd.print("V.S.");
+    lcd.setCursor(4,1);
+    lcd.print("Acionada");
+    digitalWrite(LEDVS, HIGH);
+    }
+    verifySNB();
+  }
+
+  void loop() {
+    initialDisplay();
+    buttonLigaIsPressed();
+    
+    
+  }
