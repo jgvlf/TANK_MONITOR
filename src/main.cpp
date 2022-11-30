@@ -10,6 +10,7 @@
   #define CLEANLED 13
   #define BUZZER 0
 
+bool error = false;
 int count = 0;
 
   void setup() {
@@ -23,6 +24,21 @@ int count = 0;
     pinMode(CLEANLED, OUTPUT);
     pinMode(BUZZER, OUTPUT);
     // put your setup code here, to run once:
+  }
+
+  void reset(){
+    digitalWrite(LIGA, LOW);
+    digitalWrite(LEDVE, LOW);
+    digitalWrite(MOTOR, LOW);
+    digitalWrite(LEDVS, LOW);
+    digitalWrite(CLEANLED, LOW);
+    digitalWrite(BUZZER, LOW);
+  }
+
+  void errorDisplay(){
+    lcd.setCursor(5,0);
+    lcd.print("ERROR!");
+    digitalWrite(BUZZER, HIGH);
   }
 
   void turnOnMotorDisplay(){
@@ -43,39 +59,64 @@ int count = 0;
     }
 
   void verifySNA(){
-    if(digitalRead(SNA) == HIGH && digitalRead(SNB) == HIGH || digitalRead(SNA) == LOW && digitalRead(SNB) == HIGH)
-      {
-        digitalWrite(LEDVE, LOW);
-        turnOnMotorDisplay();
-        count += 1;
-      }
-      else{
-        lcd.clear();
-        lcd.setCursor(0,0);
-        lcd.print("ERROR.");
-        delay(2000);
-        lcd.clear();
-        digitalWrite(LEDVE, LOW);
-      }
+    if (digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)
+        {
+          lcd.clear();
+          error = true;
+          while (error)
+          {
+            errorDisplay();
+            if (!(digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)){
+              error = false;
+              reset();
+            }
+          }
+        }
+      if(digitalRead(SNA) == HIGH && digitalRead(SNB) == HIGH || digitalRead(SNA) == LOW && digitalRead(SNB) == HIGH)
+        {
+          digitalWrite(LEDVE, LOW);
+          turnOnMotorDisplay();
+          count += 1;
+        }
   }
 
   void verifySNB(){
+    if (digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)
+        {
+          lcd.clear();
+          error = true;
+          while (error)
+          {
+            errorDisplay();
+            if (!(digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)){
+              error = false;
+              reset();
+            }
+          }
+          
+        }
     if(digitalRead(SNB) == LOW && digitalRead(SNA) == LOW)
         {
           digitalWrite(LEDVS, LOW);
           lcd.clear();
         }
-        else{
-          lcd.clear();
-          lcd.setCursor(0,0);
-          lcd.print("ERROR.");
-          delay(2000);
-          lcd.clear();
-          digitalWrite(LEDVS, LOW);
-        }
   }
 
   void inputValveDisplay(){
+    if (digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)
+        {
+          lcd.clear();
+          error = true;
+          while (error)
+          {
+            errorDisplay();
+            if (!(digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)){
+              error = false;
+              reset();
+            }
+          }
+          
+        }
     lcd.clear();
     while (digitalRead(SNA) == LOW)
     {
@@ -89,9 +130,23 @@ int count = 0;
   }
 
   void buttonLigaIsPressed(){
-    if(digitalRead(LIGA) == HIGH && ((digitalRead(SNA) == LOW && digitalRead(SNB) == LOW) || (digitalRead(SNA) == LOW && digitalRead(SNB) == HIGH)))
+    if (digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)
+        {
+          lcd.clear();
+          error = true;
+          while (error)
+          {
+            errorDisplay();
+            if (!(digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)){
+              error = false;
+              reset();
+            }
+          }
+          
+        }
+    if(digitalRead(LIGA) == HIGH)
       {
-        inputValveDisplay();
+          inputValveDisplay();
       }
   }
 
@@ -101,9 +156,24 @@ int count = 0;
     lcd.print("Pressione");
     lcd.setCursor(6,1);
     lcd.print("LIGA");
+    buttonLigaIsPressed();
   }
 
   void outputValveDisplay(){
+    if (digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)
+        {
+          lcd.clear();
+          error = true;
+          while (error)
+          {
+            errorDisplay();
+            if (!(digitalRead(SNA) == HIGH && digitalRead(SNB) == LOW)){
+              error = false;
+              reset();
+            }
+          }
+          
+        }
     lcd.clear();
     while (digitalRead(SNB) == HIGH)
     {
@@ -154,8 +224,5 @@ int count = 0;
   void loop() {
     digitalWrite(BUZZER, LOW);
     initialDisplay();
-    buttonLigaIsPressed();
-    verifyClean();
-    
-    
+    verifyClean();    
   }
